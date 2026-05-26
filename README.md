@@ -21,13 +21,15 @@ Protected endpoints require the `JSESSIONID` cookie returned by `POST /api/auth/
 
 This repository includes `render.yaml` and a `Dockerfile` for Render.
 
+Important: an existing Render service created as a Node app cannot be fixed by redeploying the same service. Create a new Render Blueprint or Web Service configured for Docker runtime.
+
 Recommended path:
 
 1. Push the repo to GitHub.
 2. In Render, create a new Blueprint from the repo so it reads `render.yaml`.
 3. Confirm the service runtime is Docker.
 
-If creating the service manually, choose Docker as the runtime. Do not choose Node, because Render will try `yarn start` and fail with `Couldn't find a package.json`.
+If creating the service manually, choose Docker as the runtime and leave Build Command and Start Command blank. Do not choose Node, because Render will try `yarn start` and fail with `Couldn't find a package.json`.
 
 The app reads `PORT` automatically and falls back to `8080` for local runs. The Docker image exposes `8080`, which matches the fallback port used by Spring Boot.
 

@@ -97,6 +97,9 @@ public class SavingsGoalService {
     }
 
     private void validateTargetDate(LocalDate startDate, LocalDate targetDate) {
+        if (!targetDate.isAfter(LocalDate.now())) {
+            throw ApiException.badRequest("Target date must be in the future");
+        }
         if (!targetDate.isAfter(startDate)) {
             throw ApiException.badRequest("Target date must be after the goal start date");
         }
@@ -105,8 +108,8 @@ public class SavingsGoalService {
     private GoalResponse toResponse(SavingsGoal goal) {
         BigDecimal progress = calculateProgress(goal);
         BigDecimal percentage = goal.getTargetAmount().compareTo(BigDecimal.ZERO) == 0
-                ? BigDecimal.ZERO
-                : progress.multiply(BigDecimal.valueOf(100)).divide(goal.getTargetAmount(), 2, RoundingMode.HALF_UP);
+                ? BigDecimal.ZERO.setScale(1, RoundingMode.HALF_UP)
+                : percent(progress, goal.getTargetAmount());
         BigDecimal remaining = goal.getTargetAmount().subtract(progress);
         if (remaining.compareTo(BigDecimal.ZERO) < 0) {
             remaining = BigDecimal.ZERO;
@@ -136,6 +139,19 @@ public class SavingsGoalService {
     }
 
     private BigDecimal money(BigDecimal value) {
+        if (value.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
         return value.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal percent(BigDecimal progress, BigDecimal targetAmount) {
+        BigDecimal percentage = progress.multiply(BigDecimal.valueOf(100))
+                .divide(targetAmount, 2, RoundingMode.HALF_UP)
+                .stripTrailingZeros();
+        if (percentage.scale() < 1) {
+            percentage = percentage.setScale(1, RoundingMode.HALF_UP);
+        }
+        return percentage;
     }
 }

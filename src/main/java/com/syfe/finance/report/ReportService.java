@@ -74,6 +74,9 @@ public class ReportService {
     }
 
     private BigDecimal money(BigDecimal value) {
+        if (value.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
         return value.setScale(2, RoundingMode.HALF_UP);
     }
 

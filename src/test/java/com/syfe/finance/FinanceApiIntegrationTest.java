@@ -154,7 +154,8 @@ class FinanceApiIntegrationTest {
                 .path("id").asLong();
 
         putJson("/api/transactions/" + transactionId, Map.of("date", "2024-01-02"), session)
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.date").value("2024-01-01"));
 
         mockMvc.perform(delete("/api/categories/Salary").session(session))
                 .andExpect(status().isBadRequest());

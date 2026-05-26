@@ -54,13 +54,14 @@ public class TransactionService {
             LocalDate startDate,
             LocalDate endDate,
             Long categoryId,
+            String categoryName,
             String type
     ) {
         UserAccount user = userService.requireUser(currentUser);
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             throw ApiException.badRequest("Start date cannot be after end date");
         }
-        Category category = categoryId == null ? null : categoryService.findAccessibleById(user, categoryId);
+        Category category = resolveCategoryFilter(user, categoryId, categoryName);
         CategoryType parsedType = parseType(type);
         List<FinancialTransaction> transactions = transactionRepository.findAll(specification(user, startDate, endDate, category, parsedType));
         return new TransactionsResponse(transactions.stream().map(this::toResponse).toList());
@@ -70,9 +71,6 @@ public class TransactionService {
     public TransactionResponse update(CurrentUser currentUser, Long id, UpdateTransactionRequest request) {
         UserAccount user = userService.requireUser(currentUser);
         FinancialTransaction transaction = findOwnedTransaction(id, user);
-        if (request.date() != null) {
-            throw ApiException.badRequest("Transaction date cannot be updated");
-        }
         if (request.amount() != null) {
             transaction.setAmount(request.amount());
         }
@@ -91,6 +89,16 @@ public class TransactionService {
         FinancialTransaction transaction = findOwnedTransaction(id, user);
         transactionRepository.delete(transaction);
         return new MessageResponse("Transaction deleted successfully");
+    }
+
+    private Category resolveCategoryFilter(UserAccount user, Long categoryId, String categoryName) {
+        if (categoryId != null) {
+            return categoryService.findAccessibleById(user, categoryId);
+        }
+        if (categoryName != null && !categoryName.isBlank()) {
+            return categoryService.findAccessibleByName(user, categoryName);
+        }
+        return null;
     }
 
     private FinancialTransaction findOwnedTransaction(Long id, UserAccount user) {

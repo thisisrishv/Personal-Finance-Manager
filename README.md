@@ -15,6 +15,8 @@ The API starts at:
 http://localhost:8080/api
 ```
 
+For compatibility with the provided shell test script, endpoints are also available without the `/api` prefix.
+
 Protected endpoints require the `JSESSIONID` cookie returned by `POST /api/auth/login`.
 
 ## Deployment

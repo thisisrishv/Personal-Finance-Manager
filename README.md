@@ -155,3 +155,4 @@ Reports return income totals by category, expense totals by category, and net sa
 - Default categories are global and immutable.
 - Known validation, conflict, authorization, and not-found scenarios are converted to JSON `4xx` responses by `@RestControllerAdvice`.
 - H2 is in-memory by default, which is enough for assignment testing and free Render deployments. Environment variables can override the datasource settings.
+

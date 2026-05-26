@@ -19,16 +19,17 @@ Protected endpoints require the `JSESSIONID` cookie returned by `POST /api/auth/
 
 ## Deployment
 
-This repository includes `render.yaml` and `system.properties` for Render.
+This repository includes `render.yaml` and a `Dockerfile` for Render.
 
-Render settings if configuring manually:
+Recommended path:
 
-```text
-Build command: mvn clean package -DskipTests
-Start command: java -jar target/personal-finance-manager-0.0.1-SNAPSHOT.jar
-```
+1. Push the repo to GitHub.
+2. In Render, create a new Blueprint from the repo so it reads `render.yaml`.
+3. Confirm the service runtime is Docker.
 
-The app reads `PORT` automatically and falls back to `8080` for local runs.
+If creating the service manually, choose Docker as the runtime. Do not choose Node, because Render will try `yarn start` and fail with `Couldn't find a package.json`.
+
+The app reads `PORT` automatically and falls back to `8080` for local runs. The Docker image exposes `8080`, which matches the fallback port used by Spring Boot.
 
 ## Test Script
 
